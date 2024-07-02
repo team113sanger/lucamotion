@@ -26,7 +26,7 @@ process CRISPR_LIBRARY_MATCHING {
 workflow {
     reference_genome =  file(params.reference_genome, checkIfExists: true)
     experiment =  file(params.experiment_file, checkIfExists: true)
-    libraries = file(params.lib_dir, checkIfExists:true)
+    libraries = file(params.library_file_directory, checkIfExists:true)
     Channel.fromPath(params.samples, checkIfExists: true)
     | map { file -> 
             index = file + ".crai"
