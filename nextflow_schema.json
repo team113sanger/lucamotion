@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/YOUR_PIPELINE/devlop/nextflow_schema.json",
+    "title": "Dermatlas copy number calling pipeline parameters",
+    "description": "This pipeline uses Nextflow to generate CNA calls for dermatlas. The JSON Schema was built using the nf-core pipeline schema builder.",
+    "type": "object",
+    "definitions": {
+        "input_output_options": {
+            "title": "Input/output options",
+            "type": "object",
+            "fa_icon": "fas fa-terminal",
+            "description": "Define where the pipeline should find input data and save output data.",
+            "required": [
+                "input"
+            ],
+    "properties": {
+        "outdir": {
+            "type": "string"
+        },
+        "reference_genome": {
+            "type": "string",
+            "format": "file-path"
+        },
+        "samples": {
+            "type": "string", 
+            "format": "file-path"
+        },
+        "experiment_file": {
+            "type": "string", 
+            "format": "file-path"
+        },
+        "library_file_directory": {
+            "type": "string", 
+            "format": "file-path"
+        }
+    }}
+
+}}
