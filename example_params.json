@@ -1,0 +1,6 @@
+{
+    "samples": "crispr_project_template/test/merged_crams/**.cram",
+    "reference_genome": "/lustre/scratch124/casm/team113/secure-lustre/resources/dermatlas/GRCh38_full_analysis_set_plus_decoy_hla.fa",
+    "experiment_file": "TBC",
+    "lib_dir": "TBC"
+}
