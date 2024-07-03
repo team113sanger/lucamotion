@@ -24,7 +24,7 @@ process CRISPR_LIBRARY_MATCHING {
 }
 
 workflow {
-    reference_genome =  file(params.reference_genome, checkIfExists: true)
+    reference_genome = file(params.reference_genome, checkIfExists: true)
     experiment =  file(params.experiment_file, checkIfExists: true)
     libraries = file(params.library_file_directory, checkIfExists:true)
     Channel.fromPath(params.samples, checkIfExists: true)
@@ -39,7 +39,7 @@ workflow {
 
     CRISPR_LIBRARY_MATCHING(indexed_crams, 
                             reference_genome, 
-                            experiment
+                            experiment,
                             libraries)
                             
 }
