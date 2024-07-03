@@ -1,0 +1,23 @@
+# Yusa (single-guide, no-preprocessing requried)
+sequencing_type: single_end
+
+libraries:
+  # Library (external file ID)
+  - id: yusa.tsv
+
+# Ways a read can be split into regions matching different sequences
+read_templates:
+  - id: default
+    regions:
+      - id: guide
+        libraries: ["yusa.tsv"]
+
+# How to match groups of reads to read templates
+read_group_templates:
+  default: ["default"]
+
+# Default options for library matching (can be overridden per run)
+default_options:
+  test_swaps: false
+  full_match_info: false
+
