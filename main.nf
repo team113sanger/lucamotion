@@ -27,7 +27,7 @@ process CRISPR_LIBRARY_MATCHING {
 
 }
 
-workflow CRISPR_PIPELINE {
+workflow {
     
     experiment =  file(params.experiment_file, checkIfExists: true)
     libraries = file(params.library_file_directory, checkIfExists:true)
@@ -49,4 +49,3 @@ workflow CRISPR_PIPELINE {
                             
 }
 
-CRISPR_PIPELINE()
