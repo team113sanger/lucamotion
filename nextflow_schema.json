@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/YOUR_PIPELINE/devlop/nextflow_schema.json",
-    "title": "Dermatlas copy number calling pipeline parameters",
-    "description": "This pipeline uses Nextflow to generate CNA calls for dermatlas. The JSON Schema was built using the nf-core pipeline schema builder.",
+    "title": "Example CRISPR counting pipeline",
+    "description": "This pipeline uses Nextflow to generate CRISPR counts from reads using a library file and some configuration. The JSON Schema was built using the nf-core pipeline schema builder.",
     "type": "object",
     "definitions": {
         "input_output_options": {
