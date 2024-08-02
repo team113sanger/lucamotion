@@ -3,7 +3,9 @@ nextflow.enable.dsl = 2
 
 process CRISPR_LIBRARY_MATCHING {
     publishDir "${params.outdir}/${meta.id}", mode: "copy"
-    
+    label 'process_medium'
+
+
     input: 
     tuple val(meta), path(cram), path(crai)
     path(reference_genome)
