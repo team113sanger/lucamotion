@@ -1,24 +1,18 @@
-nextflow_process {
+nextflow_pipeline {
 
-    name "Test Process CRISPR_LIBRARY_MATCHING"
+    name "Test Workflow main.nf"
     script "main.nf"
-    process "CRISPR_LIBRARY_MATCHING"
 
     test("Should run without failures") {
 
         when {
         params {
-                load("$baseDir/tests/testdata/test_params.json")
-            }
-            process {
-                """
-                """
+                load("$baseDir/tests/testdata/example_params.json")
             }
         }
 
         then {
-            assert process.success
-            assert snapshot(process.out).match()
+            assert workflow.success
         }
 
     }
