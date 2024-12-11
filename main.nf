@@ -18,13 +18,14 @@ process CRISPR_LIBRARY_MATCHING {
 
     script: 
     """
-    luca \
-    -l $lib_dir \
+    luca count \
+    --library-dir $lib_dir \
     $experiment_file \
     $cram \
-    -r $reference_genome \
-    -o . \
-    --count-mm-reads
+    --reference $reference_genome \
+    --output . \
+    --count-mm-reads \
+    --cpus 0
     """
 
 }
