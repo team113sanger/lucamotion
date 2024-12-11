@@ -5,22 +5,22 @@
 
 ## Introduction
 
-This is a simple bioinfromatics pipeline written in [Nextflow](http://www.nextflow.io) for mutliplexed crispr counting using the WTSI CASM crispr-lib-matching tool 
+This is a simple bioinfromatics pipeline written in [Nextflow](http://www.nextflow.io) for mutliplexed crispr counting using [LUCA]((https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching)) – CASM-IT's latest generation CRISPR-tool.
 
 ## Pipeline summary
 
-In brief, the pipeline takes a set CRAM files, a set of CRISPR library files containing guide sequences, and 
+In brief, the pipeline takes a set CRAM files containing CRISPR reads (alongside their indexes) a set of CRISPR library files containing guide sequences, and an experiment file and generates counts for each of the guides in the CRISPR library file.
 
 ## Inputs 
-`samples`: Path to a set of CRAM files 
+`samples`: Path to a set of CRAM files (`path/**.cram`)
 `reference_genome`: Path to the reference genome used in generating CRAM files
-`experiment_file`: Path to a CRISPR-lib-matching experiment `.yaml`
-`library_file_directory`: Path to a directory containing the guide sequences used in a screen
+`experiment_file`: Path to a CRISPR-lib-matching experiment file `.yaml`. See [LUCA](https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching) for a more thorough explanation.
+`library_file_directory`: Path to a directory containing the guide sequence files used in a screen
 `outdir`: Path to output results.
 
 ## Usage 
 
-The recommended way to launch this pipeline is using a wrapper script (e.g. `bsub < my_wrapper.sh`) that submits nextflow as a job and records the version (**e.g.** `-r 0.4.0`)  and the `.json` parameter file supplied for a run.
+The recommended way to launch this pipeline is using a wrapper script (e.g. `bsub < my_wrapper.sh`) that submits nextflow as a job and records the version (**e.g.** `-r 0.0.2`)  and the `.json` parameter file supplied for a run.
 
 An example wrapper script:
 ```
@@ -32,38 +32,22 @@ An example wrapper script:
 #BSUB -oo nf_out.o
 #BSUB -eo nf_out.e
 
-PARAMS_FILE="/lustre/scratch125/casm/team113da/users/jb63/nf_cna_testing/params.json"
+PARAMS_FILE="/lustre/scratch125/casm/team113da/users/jb63/tests/testdata/example_params.json"
 
 # Load module dependencies
 module load nextflow-23.10.0
 module load /software/modules/ISG/singularity/3.11.4
-module load /software/team113/modules/modulefiles/tw/0.6.2
 
 # Create a nextflow job that will spawn other jobs
 
 nextflow run 'https://gitlab.internal.sanger.ac.uk/team113sanger/team113_crispr/toy-crispr-pipeline' \
--r 0.0.1 \
+-r 0.0.2 \
 -params-file $PARAMS_FILE \
--c nextflow.config \
 -profile farm22 
-```
-
-
-When running the pipeline for the first time on the farm you will need to provide credentials to pull singularity containers from the team113 sanger gitlab. These should be provided as environment variables:
-`SINGULARITY_DOCKER_USERNAME`=userid@sanger.ac.uk
-`SINGULARITY_DOCKER_PASSWORD`=YOUR_GITLAB_LOGIN_PASSWORD
-
-You can fix these variables to load by default by adding the following lines to your `~/.bashrc` file
-```
-export SINGULARITY_DOCKER_USERNAME=userid@sanger.ac.uk
-export SINGULARITY_DOCKER_PASSWORD=YOUR_GITLAB_LOGIN_PASSWORD
 ```
 
 The pipeline can configured to run on either Sanger OpenStack secure-lustre instances or farm22 by changing the profile speicified:
 `-profile secure_lustre` or `-profile farm22`. 
-
-## Pipeline visualisation 
-Todo
 
 ## Testing
 

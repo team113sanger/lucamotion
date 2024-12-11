@@ -18,7 +18,7 @@ process CRISPR_LIBRARY_MATCHING {
 
     script: 
     """
-    crispr-lib-matching \
+    luca \
     -l $lib_dir \
     $experiment_file \
     $cram \
