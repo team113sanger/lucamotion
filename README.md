@@ -12,7 +12,7 @@ This is a simple bioinfromatics pipeline written in [Nextflow](http://www.nextfl
 In brief, the pipeline takes a set CRAM files containing CRISPR reads (alongside their indexes) a set of CRISPR library files containing guide sequences, and an experiment file and generates counts for each of the guides in the CRISPR library file.
 
 ## Inputs 
-`samples`: Path to a sample list - pointing to a set of CRAM files and their indexes.
+`samples`: Path to a sample list file that pointing to a set of CRAM files and their indexes (see `tests/testdata/sample_list.txt`) for an example.
 `reference_genome`: Path to the reference genome used in generating CRAM files
 `experiment_file`: Path to a CRISPR-lib-matching experiment file `.yaml`. See [LUCA](https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching) for a more thorough explanation.
 `library_file_directory`: Path to a directory containing the guide sequence files used in a screen
@@ -26,13 +26,13 @@ An example wrapper script:
 ```
 #!/bin/bash
 #BSUB -q oversubscribed
-#BSUB -G team113
+#BSUB -G team113-grp
 #BSUB -R "select[mem>2000] rusage[mem=2000] span[hosts=1]"
 #BSUB -M 2000
 #BSUB -oo nf_out.o
 #BSUB -eo nf_out.e
 
-PARAMS_FILE="/lustre/scratch125/casm/team113da/users/jb63/tests/testdata/example_params.json"
+PARAMS_FILE="tests/testdata/example_params.json"
 
 # Load module dependencies
 module load nextflow-23.10.0
@@ -41,7 +41,7 @@ module load /software/modules/ISG/singularity/3.11.4
 # Create a nextflow job that will spawn other jobs
 
 nextflow run 'https://gitlab.internal.sanger.ac.uk/team113sanger/team113_crispr/toy-crispr-pipeline' \
--r 0.0.2 \
+-r 0.1.0 \
 -params-file $PARAMS_FILE \
 -profile farm22 
 ```
