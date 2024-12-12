@@ -1,0 +1,2 @@
+file,index
+/lustre/scratch124/nf-test/crispr/7672STDY14727349_merged.cram,/lustre/scratch124/nf-test/crispr/7672STDY14727349_merged.cram.crai
