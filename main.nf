@@ -38,12 +38,10 @@ workflow {
     
     // Add index files to crams as a tuple
     Channel.fromPath(params.samples, checkIfExists: true)
-    | map { file -> 
-            index = file + ".crai"
-            tuple(file, index)}
-    | map { file, index ->
-        tuple([id: file.baseName.replace(".cram", "")], file, index)}
-    | set { indexed_crams } 
+    .splitCsv(skip: 1)
+    .map { cram, index ->
+        tuple([id: file(cram).baseName.replace(".cram", "")], file(cram), file(index))}
+    .set { indexed_crams } 
 
     CRISPR_LIBRARY_MATCHING(indexed_crams, 
                             reference_genome, 

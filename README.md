@@ -12,7 +12,7 @@ This is a simple bioinfromatics pipeline written in [Nextflow](http://www.nextfl
 In brief, the pipeline takes a set CRAM files containing CRISPR reads (alongside their indexes) a set of CRISPR library files containing guide sequences, and an experiment file and generates counts for each of the guides in the CRISPR library file.
 
 ## Inputs 
-`samples`: Path to a set of CRAM files (`path/**.cram`)
+`samples`: Path to a sample list - pointing to a set of CRAM files and their indexes.
 `reference_genome`: Path to the reference genome used in generating CRAM files
 `experiment_file`: Path to a CRISPR-lib-matching experiment file `.yaml`. See [LUCA](https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching) for a more thorough explanation.
 `library_file_directory`: Path to a directory containing the guide sequence files used in a screen
