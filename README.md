@@ -12,15 +12,15 @@ This is a simple bioinfromatics pipeline written in [Nextflow](http://www.nextfl
 In brief, the pipeline takes a set CRAM files containing CRISPR reads (alongside their indexes) a set of CRISPR library files containing guide sequences, and an experiment file and generates counts for each of the guides in the CRISPR library file.
 
 ## Inputs 
-`samples`: Path to a sample list file that pointing to a set of CRAM files and their indexes (see `tests/testdata/sample_list.txt`) for an example.
-`reference_genome`: Path to the reference genome used in generating CRAM files
-`experiment_file`: Path to a CRISPR-lib-matching experiment file `.yaml`. See [LUCA](https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching) for a more thorough explanation.
-`library_file_directory`: Path to a directory containing the guide sequence files used in a screen
-`outdir`: Path to output results.
+- `samples`: Path to a sample list file that pointing to a set of CRAM files and their indexes (see `tests/testdata/sample_list.txt`) for an example.
+- `reference_genome`: Path to the reference genome used in generating CRAM files
+- `experiment_file`: Path to a CRISPR-lib-matching experiment file `.yaml`. See [LUCA](https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching) for a more thorough explanation.
+- `library_file_directory`: Path to a directory containing the guide sequence files used in a screen
+- `outdir`: Path to output results.
 
 ## Usage 
 
-The recommended way to launch this pipeline is using a wrapper script (e.g. `bsub < my_wrapper.sh`) that submits nextflow as a job and records the version (**e.g.** `-r 0.0.2`)  and the `.json` parameter file supplied for a run.
+The recommended way to launch this pipeline is using a wrapper script (e.g. `bsub < my_wrapper.sh`) that submits nextflow as a job and records the version (**e.g.** `-r 0.1.0`)  and the `.json` parameter file supplied for a run.
 
 An example wrapper script:
 ```
@@ -48,6 +48,29 @@ nextflow run 'https://gitlab.internal.sanger.ac.uk/team113sanger/team113_crispr/
 
 The pipeline can configured to run on either Sanger OpenStack secure-lustre instances or farm22 by changing the profile speicified:
 `-profile secure_lustre` or `-profile farm22`. 
+
+```
+flowchart TB
+    subgraph " "
+    v0["Channel.fromPath"]
+    v3["reference_genome"]
+    v4["experiment_file"]
+    v5["lib_dir"]
+    end
+    v6([CRISPR_LIBRARY_MATCHING])
+    subgraph " "
+    v7[" "]
+    v8[" "]
+    end
+    v1(( ))
+    v0 --> v1
+    v3 --> v6
+    v4 --> v6
+    v5 --> v6
+    v1 --> v6
+    v6 --> v8
+    v6 --> v7
+```
 
 ## Testing
 
