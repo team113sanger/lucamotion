@@ -49,7 +49,13 @@ nextflow run 'https://gitlab.internal.sanger.ac.uk/team113sanger/team113_crispr/
 The pipeline can configured to run on either Sanger OpenStack secure-lustre instances or farm22 by changing the profile speicified:
 `-profile secure_lustre` or `-profile farm22`. 
 
+## Pipeline visualisation
+Created using nextflow's in-built visualitation features.
 ```
+nextflow run main.nf -preview -with-dag -params-file tests/testdata/test_params.json flowchart.mmd
+```
+
+```mermaid
 flowchart TB
     subgraph " "
     v0["Channel.fromPath"]
