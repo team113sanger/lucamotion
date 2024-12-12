@@ -18,13 +18,14 @@ process CRISPR_LIBRARY_MATCHING {
 
     script: 
     """
-    crispr-lib-matching \
-    -l $lib_dir \
+    luca count \
+    --library-dir $lib_dir \
     $experiment_file \
     $cram \
-    -r $reference_genome \
-    -o . \
-    --count-mm-reads
+    --reference $reference_genome \
+    --output . \
+    --count-mm-reads \
+    --cpus 0
     """
 
 }
@@ -37,12 +38,10 @@ workflow {
     
     // Add index files to crams as a tuple
     Channel.fromPath(params.samples, checkIfExists: true)
-    | map { file -> 
-            index = file + ".crai"
-            tuple(file, index)}
-    | map { file, index ->
-        tuple([id: file.baseName.replace(".cram", "")], file, index)}
-    | set { indexed_crams } 
+    .splitCsv(skip: 1)
+    .map { cram, index ->
+        tuple([id: file(cram).baseName.replace(".cram", "")], file(cram), file(index))}
+    .set { indexed_crams } 
 
     CRISPR_LIBRARY_MATCHING(indexed_crams, 
                             reference_genome, 
