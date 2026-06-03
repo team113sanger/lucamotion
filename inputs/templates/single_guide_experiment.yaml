@@ -1,0 +1,25 @@
+# Single-guide template (LUCA)
+sequencing_type: single_end
+
+libraries:
+  - id: yusa.tsv
+    reverse_on: never
+
+read_templates:
+  - id: default
+    anchor: left
+    regions:
+      - id: guide
+        libraries: [yusa.tsv]
+        skip: 0
+        max_offset: 0
+
+read_group_templates:
+  default: [default]
+
+default_options:
+  test_swaps: false
+  full_match_info: false
+  out_mm_reads: true
+  count_mm_reads: true
+  sort_mm_read_counts: true

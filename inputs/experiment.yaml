@@ -1,0 +1,22 @@
+# Default experiment file for quick starts.
+# Replace with either:
+# - inputs/templates/single_guide_experiment.yaml
+# - inputs/templates/dual_guide_synergy_experiment.yaml
+
+sequencing_type: single_end
+
+libraries:
+  - id: yusa.tsv
+
+read_templates:
+  - id: default
+    regions:
+      - id: guide
+        libraries: [yusa.tsv]
+
+read_group_templates:
+  default: [default]
+
+default_options:
+  test_swaps: false
+  full_match_info: false
