@@ -5,8 +5,8 @@ workflow INPUT_MANIFEST {
     take:
     input_manifest
 
-    main:
-    Channel
+    emit:
+    channel
         .fromPath(input_manifest, checkIfExists: true)
         .splitText()
         .filter { line -> line && !line.toLowerCase().startsWith('filepath') && !line.toLowerCase().startsWith('file') }
@@ -22,8 +22,4 @@ workflow INPUT_MANIFEST {
                 .replaceFirst(/\.bam$/, '')
             tuple([id: sample_id], file(alignment, checkIfExists: true), index)
         }
-        .set { input_alignments_ch }
-
-    emit:
-    input_alignments = input_alignments_ch
 }

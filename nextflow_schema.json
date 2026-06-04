@@ -9,10 +9,6 @@
       "type": "string",
       "description": "Input manifest (TSV/CSV) containing filepath,index where BAM rows can omit index."
     },
-    "samples": {
-      "type": "string",
-      "description": "Deprecated alias for input_manifest."
-    },
     "reference_genome": {
       "type": "string",
       "description": "Reference FASTA path used for CRAM decoding."
@@ -53,9 +49,5 @@
       "type": "string"
     }
   },
-  "required": ["reference_genome", "experiment_file", "library_file_directory", "outdir"],
-  "anyOf": [
-    { "required": ["input_manifest"] },
-    { "required": ["samples"] }
-  ]
+  "required": ["input_manifest", "reference_genome", "experiment_file", "library_file_directory", "outdir"]
 }

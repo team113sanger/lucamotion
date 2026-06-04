@@ -7,13 +7,10 @@ include { AGGREGATE_COUNTS } from './modules/local/aggregate_counts/main'
 
 workflow CRISPR_PIPELINE {
     main:
-    def manifest_path = params.input_manifest ?: params.samples
-    if (!manifest_path) {
-        error "Provide either --input_manifest or --samples"
-    }
+    def manifest_path = file(params.input_manifest, checkIfExists: true)
 
     INPUT_MANIFEST(manifest_path)
-    guide_input_ch = INPUT_MANIFEST.out.input_alignments
+    guide_input_ch = INPUT_MANIFEST.out
 
     GUIDE_COUNTING(
         guide_input_ch,
@@ -35,8 +32,8 @@ workflow CRISPR_PIPELINE {
     counts = GUIDE_COUNTING.out.counts
     configs = GUIDE_COUNTING.out.configs
     combination_counts = GUIDE_COUNTING.out.combination_counts
-    aggregate_matrix = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.matrix : Channel.empty()
-    aggregate_metadata = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.metadata : Channel.empty()
+    aggregate_matrix = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.matrix : channel.empty()
+    aggregate_metadata = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.metadata : channel.empty()
 }
 
 workflow {
