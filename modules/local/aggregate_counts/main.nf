@@ -1,5 +1,5 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
+nextflow.enable.types = true
 
 process AGGREGATE_COUNTS {
     tag "aggregate_counts"
@@ -8,17 +8,18 @@ process AGGREGATE_COUNTS {
     publishDir "${params.outdir}/aggregated_counts", mode: params.publish_dir_mode
 
     input:
-    val(count_entries)
+    ids: List<String>
+    files: List<Path>
 
     output:
-    path("combination_matrix.tsv"), emit: matrix
-    path("combination_metadata.tsv"), emit: metadata
-
-    when:
-    task.ext.when == null || task.ext.when
+    matrix: Path = file('combination_matrix.tsv')
+    metadata: Path = file('combination_metadata.tsv')
 
     script:
-    def entries_json = groovy.json.JsonOutput.toJson(count_entries)
+    // Pair each id with its staged file's basename (files are staged into the work
+    // dir, so they are opened by name rather than by an absolute upstream path).
+    def entries = [ids, files.collect { f -> f.name }].transpose()
+    def entries_json = groovy.json.JsonOutput.toJson(entries)
     """
     python3 - <<'PY'
     import csv

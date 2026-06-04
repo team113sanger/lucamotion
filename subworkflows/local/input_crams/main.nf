@@ -1,13 +1,13 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
+nextflow.enable.types = true
 
 workflow INPUT_MANIFEST {
     take:
-    input_manifest
+    input_manifest: Path
 
     emit:
     channel
-        .fromPath(input_manifest, checkIfExists: true)
+        .of(input_manifest)
         .splitText()
         .filter { line -> line && !line.toLowerCase().startsWith('filepath') && !line.toLowerCase().startsWith('file') }
         .map { line ->
@@ -15,11 +15,10 @@ workflow INPUT_MANIFEST {
             if (fields.size() < 1) {
                 error "Invalid input manifest row: ${line}"
             }
-            def alignment = fields[0]
-            def index = fields.size() > 1 ? fields[1] : ''
-            def sample_id = file(alignment).baseName
-                .replaceFirst(/\.cram$/, '')
-                .replaceFirst(/\.bam$/, '')
+            def sample_id = fields[0]
+            def alignment = fields[1]
+            def index = fields.size() > 2 ? fields[2] : ''
+
             tuple([id: sample_id], file(alignment, checkIfExists: true), index)
         }
 }
