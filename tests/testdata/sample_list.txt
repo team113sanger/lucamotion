@@ -1,2 +1,2 @@
-file,index
-/lustre/scratch124/nf-test/crispr/7672STDY14727349_merged.cram,/lustre/scratch124/nf-test/crispr/7672STDY14727349_merged.cram.crai
+sample_id,file,index
+demo,/lustre/scratch125/casm/teams/team113/secure-lustre/team113/nf-test/crispr/8370STDY16851429.52178_22.cram,/lustre/scratch125/casm/teams/team113/secure-lustre/team113/nf-test/crispr/8370STDY16851429.52178_22.cram.crai

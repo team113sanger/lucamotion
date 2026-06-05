@@ -5,20 +5,20 @@ workflow INPUT_MANIFEST {
     take:
     input_manifest: Path
 
-    emit:
-    channel
-        .of(input_manifest)
-        .splitText()
-        .filter { line -> line && !line.toLowerCase().startsWith('filepath') && !line.toLowerCase().startsWith('file') }
-        .map { line ->
-            def fields = line.trim().split(/[,\t]/)
-            if (fields.size() < 1) {
-                error "Invalid input manifest row: ${line}"
+    main:
+    samples = channel.of(input_manifest)
+        .splitCsv(header: true)
+        .map { row ->
+            if (!row.sample_id || !row.file) {
+                error "Invalid input manifest row: ${row}"
             }
-            def sample_id = fields[0]
-            def alignment = fields[1]
-            def index = fields.size() > 2 ? fields[2] : ''
-
-            tuple([id: sample_id], file(alignment, checkIfExists: true), index)
+            tuple(
+                [id: row.sample_id],
+                file(row.file, checkIfExists: true),
+                row.index ?: ''
+            )
         }
+
+    emit:
+    samples
 }
