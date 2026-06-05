@@ -2,4 +2,6 @@ work
 .nextflow*
 .nextflow/*
 .nf-test*
-resultsnxf-tmp.*
+results
+nxf-tmp.*
+results
