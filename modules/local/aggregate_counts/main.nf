@@ -2,18 +2,17 @@
 nextflow.enable.types = true
 
 process AGGREGATE_COUNTS {
-    tag "aggregate_counts"
+    tag "combination_${combination_index}"
     label 'process_low'
 
     publishDir "${params.outdir}/aggregated_counts", mode: params.publish_dir_mode
 
     input:
-    ids: List<String>
-    files: List<Path>
+    tuple(combination_index: Integer, ids: List<String>, files: List<Path>)
 
     output:
-    matrix: Path = file('combination_matrix.tsv')
-    metadata: Path = file('combination_metadata.tsv')
+    matrix: Tuple<Integer,Path> = tuple(combination_index, file("combination_${combination_index}_matrix.tsv"))
+    metadata: Tuple<Integer,Path> = tuple(combination_index, file("combination_${combination_index}_metadata.tsv"))
 
     script:
     // Pair each id with its staged file's basename (files are staged into the work
@@ -40,13 +39,13 @@ process AGGREGATE_COUNTS {
                 key = f"{row[0]}|{row[1]}"
                 matrix[key][sample_id] = row[2]
 
-    with open('combination_matrix.tsv', 'w', newline='') as out:
+    with open('combination_${combination_index}_matrix.tsv', 'w', newline='') as out:
         writer = csv.writer(out, delimiter='\\t')
         writer.writerow(['combination_id'] + sample_ids)
         for combo in sorted(matrix):
             writer.writerow([combo] + [matrix[combo].get(s, '0') for s in sample_ids])
 
-    with open('combination_metadata.tsv', 'w', newline='') as out:
+    with open('combination_${combination_index}_metadata.tsv', 'w', newline='') as out:
         writer = csv.writer(out, delimiter='\\t')
         writer.writerow(['sample_id', 'source_file'])
         for sample_id, source_file in counts_files:

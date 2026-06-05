@@ -21,9 +21,9 @@ process LUCA_COUNT {
     lib_dir: Path
 
     output:
-    counts: Tuple<Map,Path> = tuple(meta, file('*.tsv'))
-    configs: Tuple<Map,Path> = tuple(meta, file('*.json'))
-    combination_counts: Tuple<Map,Path> = tuple(meta, file("${meta.id}.combination.0.counts.tsv", optional: true))
+    counts: Tuple<Map,List<Path>> = tuple(meta, files("${meta.id}.lib.*.counts.tsv"))
+    configs: Tuple<Map,List<Path>> = tuple(meta, files('*.json'))
+    combination_counts: Tuple<Map,List<Path>> = tuple(meta, files("${meta.id}.combination.*.counts.tsv", optional: true))
 
     script:
     def mm_reads_arg = params.luca_count_mm_reads ? '--count-mm-reads' : ''

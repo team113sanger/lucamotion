@@ -20,24 +20,27 @@ workflow CRISPR_PIPELINE {
     )
 
     if (params.run_aggregate_counts) {
-        // Collect all (id, counts file) pairs into a single list, then split into two
-        // aligned lists. Files are kept as Path (not String) so Nextflow stages them
-        // into the AGGREGATE_COUNTS work dir — required for cluster/cloud executors.
-        def counts_for_aggregation = GUIDE_COUNTING.out.combination_counts
-            .map { meta, counts_tsv -> [meta.id as String, counts_tsv] }
-            .toList()
-            .multiMap { rows ->
-                ids:   rows.collect { row -> row[0] }
-                files: rows.collect { row -> row[1] }
+        // Each sample emits a list of <id>.combination.<N>.counts.tsv files. Regroup them
+        // *by combination index N* so that combination N from every sample is aggregated
+        // into a single matrix: flatten one file per item, parse N from the filename, then
+        // groupTuple by N. Files are kept as Path (not String) so Nextflow stages them into
+        // the AGGREGATE_COUNTS work dir — required for cluster/cloud executors.
+        def counts_by_combination = GUIDE_COUNTING.out.combination_counts
+            .flatMap { meta, counts_files ->
+                counts_files.collect { counts_tsv ->
+                    def index = (counts_tsv.name =~ /\.combination\.(\d+)\.counts\.tsv$/)[0][1] as Integer
+                    tuple(index, meta.id as String, counts_tsv)
+                }
             }
+            .groupTuple()
 
-        AGGREGATE_COUNTS(counts_for_aggregation.ids, counts_for_aggregation.files)
+        AGGREGATE_COUNTS(counts_by_combination)
     }
 
     emit:
-    counts: Channel<Tuple<Map,Path>> = GUIDE_COUNTING.out.counts
-    configs: Channel<Tuple<Map,Path>> = GUIDE_COUNTING.out.configs
-    combination_counts: Channel<Tuple<Map,Path>> = GUIDE_COUNTING.out.combination_counts
+    counts: Channel<Tuple<Map,List<Path>>> = GUIDE_COUNTING.out.counts
+    configs: Channel<Tuple<Map,List<Path>>> = GUIDE_COUNTING.out.configs
+    combination_counts: Channel<Tuple<Map,List<Path>>> = GUIDE_COUNTING.out.combination_counts
     aggregate_matrix = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.matrix : channel.empty()
     aggregate_metadata = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.metadata : channel.empty()
 }

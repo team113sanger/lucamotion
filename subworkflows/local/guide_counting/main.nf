@@ -14,7 +14,7 @@ workflow GUIDE_COUNTING {
     LUCA_COUNT(input_alignments, reference_genome, experiment_file, library_dir)
 
     emit:
-    counts: Channel<Tuple<Map,Path>> = LUCA_COUNT.out.counts
-    configs: Channel<Tuple<Map,Path>> = LUCA_COUNT.out.configs
-    combination_counts: Channel<Tuple<Map,Path>> = LUCA_COUNT.out.combination_counts
+    counts: Channel<Tuple<Map,List<Path>>> = LUCA_COUNT.out.counts
+    configs: Channel<Tuple<Map,List<Path>>> = LUCA_COUNT.out.configs
+    combination_counts: Channel<Tuple<Map,List<Path>>> = LUCA_COUNT.out.combination_counts
 }
