@@ -1,24 +1,24 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
+nextflow.enable.types = true
 
 process AGGREGATE_COUNTS {
-    tag "aggregate_counts"
+    tag "combination_${combination_index}"
     label 'process_low'
 
     publishDir "${params.outdir}/aggregated_counts", mode: params.publish_dir_mode
 
     input:
-    val(count_entries)
+    tuple(combination_index: Integer, ids: List<String>, files: List<Path>)
 
     output:
-    path("combination_matrix.tsv"), emit: matrix
-    path("combination_metadata.tsv"), emit: metadata
-
-    when:
-    task.ext.when == null || task.ext.when
+    matrix: Tuple<Integer,Path> = tuple(combination_index, file("combination_${combination_index}_matrix.tsv"))
+    metadata: Tuple<Integer,Path> = tuple(combination_index, file("combination_${combination_index}_metadata.tsv"))
 
     script:
-    def entries_json = groovy.json.JsonOutput.toJson(count_entries)
+    // Pair each id with its staged file's basename (files are staged into the work
+    // dir, so they are opened by name rather than by an absolute upstream path).
+    def entries = [ids, files.collect { f -> f.name }].transpose()
+    def entries_json = groovy.json.JsonOutput.toJson(entries)
     """
     python3 - <<'PY'
     import csv
@@ -39,13 +39,13 @@ process AGGREGATE_COUNTS {
                 key = f"{row[0]}|{row[1]}"
                 matrix[key][sample_id] = row[2]
 
-    with open('combination_matrix.tsv', 'w', newline='') as out:
+    with open('combination_${combination_index}_matrix.tsv', 'w', newline='') as out:
         writer = csv.writer(out, delimiter='\\t')
         writer.writerow(['combination_id'] + sample_ids)
         for combo in sorted(matrix):
             writer.writerow([combo] + [matrix[combo].get(s, '0') for s in sample_ids])
 
-    with open('combination_metadata.tsv', 'w', newline='') as out:
+    with open('combination_${combination_index}_metadata.tsv', 'w', newline='') as out:
         writer = csv.writer(out, delimiter='\\t')
         writer.writerow(['sample_id', 'source_file'])
         for sample_id, source_file in counts_files:

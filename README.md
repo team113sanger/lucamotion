@@ -1,4 +1,4 @@
-# toy-crispr-pipeline
+# lucamotion
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.04.5-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
@@ -20,6 +20,9 @@ In brief, the pipeline takes a set BAM/CRAM files containing CRISPR reads a set 
 ## Inputs
 - `samples manifest`: Path to a sample list file that pointing to a set of CRAM files and their indexes. Create a TSV (or CSV) with a header row. Supported headers: `filepath,index` or `file,index`. (see `inputs/sample_list.tsv`) for an example.
 - `reference_genome`: Path to the reference genome used in generating CRAM files
+- `experiment_file`: Path to a CRISPR-lib-matching experiment file `.yaml`. See [LUCA](https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching) for a more thorough explanation.
+- `library_file_directory`: Path to a directory containing the guide sequence files used in a screen
+- `outdir`: Path to output results.
 
 This can be provided in the params.yaml 
 
@@ -40,9 +43,6 @@ luca_sort_mm_read_counts: true
 luca_cpus: 8
 luca_extra_args: ""
 ```
-- `experiment_file`: Path to a CRISPR-lib-matching experiment file `.yaml`. See [LUCA](https://gitlab.internal.sanger.ac.uk/casm/crispr/crispr-lib-matching) for a more thorough explanation.
-- `library_file_directory`: Path to a directory containing the guide sequence files used in a screen
-- `outdir`: Path to output results.
 
 
 ## Usage 
@@ -97,7 +97,7 @@ nextflow run main.nf -preview -with-dag -params-file tests/testdata/test_params.
 ```mermaid
 flowchart TB
     subgraph params["Params"]
-        manifest["input_manifest / samples"]
+        manifest["input_manifest"]
         ref["reference_genome"]
         exp["experiment_file"]
         lib["library_file_directory"]

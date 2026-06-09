@@ -1,25 +1,29 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
+nextflow.enable.types = true
 
 process LUCA_COUNT {
     tag "${meta.id}"
     label 'process_medium'
 
-    publishDir "${params.outdir}/guide_count_${meta.id}", mode: params.publish_dir_mode
+    // Closure form is required under typed syntax so `meta` is resolved per-task.
+    // Files are renamed with an `<id>.` prefix in the script (so downstream staging
+    // sees unique names); saveAs strips that prefix to publish under original names.
+    publishDir(
+        path: { "${params.outdir}/guide_count_${meta.id}" },
+        mode: params.publish_dir_mode,
+        saveAs: { fn -> fn.startsWith("${meta.id}.") ? fn.substring("${meta.id}.".length()) : fn }
+    )
 
     input:
-    tuple val(meta), path(alignment), val(index_file)
-    path(reference_genome)
-    path(experiment_file)
-    path(lib_dir)
+    tuple(meta: Map, alignment: Path, index_file: Path)
+    reference_genome: Path
+    experiment_file: Path
+    lib_dir: Path
 
     output:
-    tuple val(meta), path("*.tsv"), emit: counts
-    tuple val(meta), path("*.json"), emit: configs
-    tuple val(meta), path("combination.0.counts.tsv"), optional: true, emit: combination_counts
-
-    when:
-    task.ext.when == null || task.ext.when
+    counts: Tuple<Map,List<Path>> = tuple(meta, files("${meta.id}.lib.*.counts.tsv"))
+    configs: Tuple<Map,List<Path>> = tuple(meta, files('*.json'))
+    combination_counts: Tuple<Map,List<Path>> = tuple(meta, files("${meta.id}.combination.*.counts.tsv", optional: true))
 
     script:
     def mm_reads_arg = params.luca_count_mm_reads ? '--count-mm-reads' : ''
@@ -38,5 +42,13 @@ process LUCA_COUNT {
       ${extra_args} \
       ${experiment_file} \
       ${alignment}
+
+    for f in *.tsv *.json; do
+        [ -e "\$f" ] || continue
+        case "\$f" in
+            ${meta.id}.*) ;;
+            *) mv "\$f" "${meta.id}.\$f" ;;
+        esac
+    done
     """
 }

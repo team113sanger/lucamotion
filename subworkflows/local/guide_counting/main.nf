@@ -1,20 +1,20 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
+nextflow.enable.types = true
 
 include { LUCA_COUNT } from '../../../modules/local/luca_count/main'
 
 workflow GUIDE_COUNTING {
     take:
-    input_alignments
-    reference_genome
-    experiment_file
-    library_dir
+    input_alignments: Channel<Tuple<Map,Path,String>>
+    reference_genome: Path
+    experiment_file: Path
+    library_dir: Path
 
     main:
     LUCA_COUNT(input_alignments, reference_genome, experiment_file, library_dir)
 
     emit:
-    counts = LUCA_COUNT.out.counts
-    configs = LUCA_COUNT.out.configs
-    combination_counts = LUCA_COUNT.out.combination_counts
+    counts: Channel<Tuple<Map,List<Path>>> = LUCA_COUNT.out.counts
+    configs: Channel<Tuple<Map,List<Path>>> = LUCA_COUNT.out.configs
+    combination_counts: Channel<Tuple<Map,List<Path>>> = LUCA_COUNT.out.combination_counts
 }

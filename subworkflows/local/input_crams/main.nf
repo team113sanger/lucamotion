@@ -1,29 +1,24 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
+nextflow.enable.types = true
 
 workflow INPUT_MANIFEST {
     take:
-    input_manifest
+    input_manifest: Path
 
     main:
-    Channel
-        .fromPath(input_manifest, checkIfExists: true)
-        .splitText()
-        .filter { line -> line && !line.toLowerCase().startsWith('filepath') && !line.toLowerCase().startsWith('file') }
-        .map { line ->
-            def fields = line.trim().split(/[,\t]/)
-            if (fields.size() < 1) {
-                error "Invalid input manifest row: ${line}"
+    samples = channel.of(input_manifest)
+        .splitCsv(header: true)
+        .map { row ->
+            if (!row.sample_id || !row.file) {
+                error "Invalid input manifest row: ${row}"
             }
-            def alignment = fields[0]
-            def index = fields.size() > 1 ? fields[1] : ''
-            def sample_id = file(alignment).baseName
-                .replaceFirst(/\.cram$/, '')
-                .replaceFirst(/\.bam$/, '')
-            tuple([id: sample_id], file(alignment, checkIfExists: true), index)
+            tuple(
+                [id: row.sample_id],
+                file(row.file, checkIfExists: true),
+                row.index ?: ''
+            )
         }
-        .set { input_alignments_ch }
 
     emit:
-    input_alignments = input_alignments_ch
+    samples
 }
