@@ -3,3 +3,5 @@ work
 .nextflow/*
 .nf-test*
 results
+nxf-tmp.*
+results

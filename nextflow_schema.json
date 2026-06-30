@@ -1,38 +1,53 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/YOUR_PIPELINE/devlop/nextflow_schema.json",
-    "title": "Example CRISPR counting pipeline",
-    "description": "This pipeline uses Nextflow to generate CRISPR counts from reads using a library file and some configuration. The JSON Schema was built using the nf-core pipeline schema builder.",
-    "type": "object",
-    "definitions": {
-        "input_output_options": {
-            "title": "Input/output options",
-            "type": "object",
-            "fa_icon": "fas fa-terminal",
-            "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input"
-            ],
-    "properties": {
-        "outdir": {
-            "type": "string"
-        },
-        "reference_genome": {
-            "type": "string",
-            "format": "file-path"
-        },
-        "samples": {
-            "type": "string", 
-            "format": "file-path"
-        },
-        "experiment_file": {
-            "type": "string", 
-            "format": "file-path"
-        },
-        "library_file_directory": {
-            "type": "string", 
-            "format": "file-path"
-        }
-    }}
-
-}}
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gitlab.internal.sanger.ac.uk/team113sanger/team113_crispr/toy-crispr-pipeline/-/raw/develop/nextflow_schema.json",
+  "title": "toy-crispr-pipeline parameters",
+  "description": "Schema for LUCA guide counting workflow parameters.",
+  "type": "object",
+  "properties": {
+    "input_manifest": {
+      "type": "string",
+      "description": "Input manifest (TSV/CSV) containing filepath,index where BAM rows can omit index."
+    },
+    "reference_genome": {
+      "type": "string",
+      "description": "Reference FASTA path used for CRAM decoding."
+    },
+    "experiment_file": {
+      "type": "string",
+      "description": "LUCA experiment YAML/JSON file."
+    },
+    "library_file_directory": {
+      "type": "string",
+      "description": "Directory containing LUCA library TSV files."
+    },
+    "outdir": {
+      "type": "string",
+      "description": "Output directory."
+    },
+    "publish_dir_mode": {
+      "type": "string",
+      "enum": ["copy", "symlink", "move"]
+    },
+    "run_luca_count": {
+      "type": "boolean"
+    },
+    "run_aggregate_counts": {
+      "type": "boolean"
+    },
+    "luca_count_mm_reads": {
+      "type": "boolean"
+    },
+    "luca_sort_mm_read_counts": {
+      "type": "boolean"
+    },
+    "luca_cpus": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "luca_extra_args": {
+      "type": "string"
+    }
+  },
+  "required": ["input_manifest", "reference_genome", "experiment_file", "library_file_directory", "outdir"]
+}

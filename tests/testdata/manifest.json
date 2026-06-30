@@ -1,0 +1,12 @@
+{
+  "libraries": {
+    "synergy_pos_1": "synergy_pos_1_guides.tsv",
+    "synergy_pos_2": "synergy_pos_2_guides.tsv",
+    "synergy_pos_1_guides.tsv": "synergy_pos_1_guides.tsv",
+    "synergy_pos_2_guides.tsv": "synergy_pos_2_guides.tsv"
+  },
+  "combination_filters": {
+    "synergy_pair_filter": "synergy_pair_filter.tsv",
+    "synergy_pair_filter.tsv": "synergy_pair_filter.tsv"
+  }
+}

@@ -1,52 +1,50 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
+nextflow.enable.types = true
 
-process CRISPR_LIBRARY_MATCHING {
-    publishDir "${params.outdir}/${meta.id}", mode: "copy"
-    label 'process_medium'
+include { INPUT_MANIFEST } from './subworkflows/local/input_crams/main'
+include { GUIDE_COUNTING } from './subworkflows/local/guide_counting/main'
+include { AGGREGATE_COUNTS } from './modules/local/aggregate_counts/main'
 
+workflow CRISPR_PIPELINE {
+    main:
+    def manifest_path = file(params.input_manifest, checkIfExists: true)
 
-    input: 
-    tuple val(meta), path(cram), path(crai)
-    path(reference_genome)
-    path(experiment_file)
-    path(lib_dir)
+    INPUT_MANIFEST(manifest_path)
+    def guide_input_ch = INPUT_MANIFEST.out
 
-    output: 
-    tuple val(meta), path ("*.tsv"), emit: counts 
-    tuple val(meta), path ("*.json"), emit: config 
+    GUIDE_COUNTING(
+        guide_input_ch,
+        file(params.reference_genome, checkIfExists: true),
+        file(params.experiment_file, checkIfExists: true),
+        file(params.library_file_directory, checkIfExists: true)
+    )
 
-    script: 
-    """
-    luca count \
-    --library-dir $lib_dir \
-    $experiment_file \
-    $cram \
-    --reference $reference_genome \
-    --output . \
-    --count-mm-reads \
-    --cpus 0
-    """
+    if (params.run_aggregate_counts) {
+        // Each sample emits a list of <id>.combination.<N>.counts.tsv files. Regroup them
+        // *by combination index N* so that combination N from every sample is aggregated
+        // into a single matrix: flatten one file per item, parse N from the filename, then
+        // groupTuple by N. Files are kept as Path (not String) so Nextflow stages them into
+        // the AGGREGATE_COUNTS work dir — required for cluster/cloud executors.
+        def counts_by_combination = GUIDE_COUNTING.out.combination_counts
+            .flatMap { meta, counts_files ->
+                counts_files.collect { counts_tsv ->
+                    def index = (counts_tsv.name =~ /\.combination\.(\d+)\.counts\.tsv$/)[0][1] as Integer
+                    tuple(index, meta.id as String, counts_tsv)
+                }
+            }
+            .groupTuple()
 
+        AGGREGATE_COUNTS(counts_by_combination)
+    }
+
+    emit:
+    counts: Channel<Tuple<Map,List<Path>>> = GUIDE_COUNTING.out.counts
+    configs: Channel<Tuple<Map,List<Path>>> = GUIDE_COUNTING.out.configs
+    combination_counts: Channel<Tuple<Map,List<Path>>> = GUIDE_COUNTING.out.combination_counts
+    aggregate_matrix = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.matrix : channel.empty()
+    aggregate_metadata = params.run_aggregate_counts ? AGGREGATE_COUNTS.out.metadata : channel.empty()
 }
 
 workflow {
-    
-    experiment =  file(params.experiment_file, checkIfExists: true)
-    libraries = file(params.library_file_directory, checkIfExists:true)
-    reference_genome = file(params.reference_genome, checkIfExists: true)
-    
-    // Add index files to crams as a tuple
-    Channel.fromPath(params.samples, checkIfExists: true)
-    .splitCsv(skip: 1)
-    .map { cram, index ->
-        tuple([id: file(cram).baseName.replace(".cram", "")], file(cram), file(index))}
-    .set { indexed_crams } 
-
-    CRISPR_LIBRARY_MATCHING(indexed_crams, 
-                            reference_genome, 
-                            experiment,
-                            libraries)
-                            
+    CRISPR_PIPELINE()
 }
-
